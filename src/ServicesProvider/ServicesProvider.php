@@ -15,6 +15,10 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
+use UserFrosting\Sprinkle\Core\Util\RawAssetBundles;
+use UserFrosting\Assets\AssetBundles\GulpBundleAssetsCompiledBundles as CompiledAssetBundles;
+use UserFrosting\Assets\Assets;
+use UserFrosting\Sprinkle\Core\Facades\Debug;
 
 /**
  * UserFrosting core services provider.
@@ -144,6 +148,69 @@ class ServicesProvider
             $logger->pushHandler($handler);
 
             return $logger;
+        };
+
+        $container['assets'] = function ($c) {
+            $config = $c->config;
+            $locator = $c->locator;
+
+            // Load asset schema
+            if ($config['assets.use_raw']) {
+
+                // Register sprinkle assets stream, plus vendor assets in shared streams
+                $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
+                $locator->registerStream('assets', 'vendor', \UserFrosting\BROWSERIFIED_ASSET_DIR, true);
+                $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
+                $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
+
+                if ($config['ufhacks.assets.with_url']) {
+                    $baseUrl1 = $config['site.uri.public'];
+                } else {
+                    $baseUrl1 = '';
+                }
+                $baseUrl = $baseUrl1 . '/' . $config['assets.compiled.path'];
+                //$baseUrl = $config['site.uri.public'] . '/' . $config['assets.raw.path'];
+
+                $assets = new Assets($locator, 'assets', $baseUrl);
+
+                // Load raw asset bundles for each Sprinkle.
+
+                // Retrieve locations of raw asset bundle schemas that exist.
+                $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config['assets.raw.schema']));
+
+                // Load asset bundle schemas that exist.
+                if (array_key_exists(0, $bundleSchemas)) {
+                    $bundles = new RawAssetBundles(array_shift($bundleSchemas));
+
+                    foreach ($bundleSchemas as $bundleSchema) {
+                        $bundles->extend($bundleSchema);
+                    }
+
+                    // Add bundles to asset manager.
+                    $assets->addAssetBundles($bundles);
+                }
+            } else {
+
+                // Register compiled assets stream in public folder + alias for vendor ones + build stream for CompiledAssetBundles
+                $locator->registerStream('assets', '', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
+                $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
+                $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
+
+                if ($config['ufhacks.assets.with_url']) {
+                    $baseUrl1 = $config['site.uri.public'];
+                } else {
+                    $baseUrl1 = '';
+                }
+                $baseUrl = $baseUrl1 . '/' . $config['assets.compiled.path'];
+                $assets = new Assets($locator, 'assets', $baseUrl);
+
+                // Load compiled asset bundle.
+                $path = $locator->findResource('build://' . $config['assets.compiled.schema'], true, true);
+                $bundles = new CompiledAssetBundles($path);
+                $assets->addAssetBundles($bundles);
+            }
+
+            return $assets;
         };
     }
 }

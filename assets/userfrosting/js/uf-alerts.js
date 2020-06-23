@@ -40,7 +40,8 @@
     // Define plugin name and defaults.
     var pluginName = 'ufAlerts',
         defaults = {
-            url: site.uri.public + '/alerts',
+            //url: site.uri.public + '/alerts',
+            url: '/alerts',
             scrollToTop: true,
             scrollWhenVisible: false,
             agglomerate: false,

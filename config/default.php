@@ -1,9 +1,9 @@
 <?php
 
 /*
- * UserFrosting (http://www.userfrosting.com)
- *
- * @link      https://github.com/userfrosting/UserFrosting
+     * UserFrosting (http://www.userfrosting.com)
+     *
+     * @link      https://github.com/userfrosting/UserFrosting
  * @copyright Copyright (c) 2019 Alexander Weissman
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
@@ -37,4 +37,9 @@ return [
         ]
         */
     ],
+    'ufhacks' => [
+        'assets' => ['with_url' => false]
+    ] //,
+    //    'site' => ['uri' => ['public' => '']]
+
 ];
