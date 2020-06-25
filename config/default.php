@@ -36,10 +36,12 @@ return [
             'query' => 'query_userfrosting_' . date('Ym') . '.log'
         ]
         */
-    ],
+    ]
+    /*,
     'ufhacks' => [
         'assets' => ['with_url' => false]
-    ] //,
+    ] */
+    //,
     //    'site' => ['uri' => ['public' => '']]
 
 ];

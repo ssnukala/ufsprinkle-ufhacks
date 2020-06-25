@@ -149,7 +149,7 @@ class ServicesProvider
 
             return $logger;
         };
-
+        /*
         $container['assets'] = function ($c) {
             $config = $c->config;
             $locator = $c->locator;
@@ -212,5 +212,6 @@ class ServicesProvider
 
             return $assets;
         };
+        */
     }
 }
