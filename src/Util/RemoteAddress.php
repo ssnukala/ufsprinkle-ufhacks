@@ -12,6 +12,9 @@ namespace UserFrosting\Sprinkle\UfHacks\Util;
 /**
  * Functionality for determining client IP address.
  */
+
+use UserFrosting\Sprinkle\Core\Facades\Debug;
+
 class RemoteAddress
 {
     /**
@@ -129,6 +132,7 @@ class RemoteAddress
             return false;
         }
 
+        Debug::debug("Line 135 Server headder " . $_SERVER[$header]);
         // Extract IPs
         $ips = explode(',', $_SERVER[$header]);
         // trim, so we can compare against trusted proxies properly
@@ -146,6 +150,7 @@ class RemoteAddress
         // not know if it is a proxy server, or a client. As such, we treat it
         // as the originating IP.
         // @see http://en.wikipedia.org/wiki/X-Forwarded-For
+        Debug::debug("Line 153 Server headder ", $ips);
         $ip = array_pop($ips);
         return $ip;
     }
