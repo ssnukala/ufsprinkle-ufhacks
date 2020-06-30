@@ -128,6 +128,7 @@ class RemoteAddress
         }
 
         $header = $this->proxyHeader;
+        Debug::debug("Line 131 Server header $header is " . $_SERVER[$header]);
         if (!isset($_SERVER[$header]) || empty($_SERVER[$header])) {
             return false;
         }
