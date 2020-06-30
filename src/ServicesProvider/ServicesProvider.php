@@ -19,6 +19,8 @@ use UserFrosting\Sprinkle\Core\Util\RawAssetBundles;
 use UserFrosting\Assets\AssetBundles\GulpBundleAssetsCompiledBundles as CompiledAssetBundles;
 use UserFrosting\Assets\Assets;
 use UserFrosting\Sprinkle\Core\Facades\Debug;
+use UserFrosting\Sprinkle\Account\Log\UserActivityDatabaseHandler;
+use UserFrosting\Sprinkle\UfHacks\Log\UserActivityProcessor;
 
 /**
  * UserFrosting core services provider.
@@ -149,6 +151,36 @@ class ServicesProvider
 
             return $logger;
         };
+
+
+        /*
+         * Logger for logging the current user's activities to the database.
+         *
+         * Extend this service to push additional handlers onto the 'userActivity' log stack.
+         *
+         * @return \Monolog\Logger
+         */
+        $container['userActivityLogger'] = function ($c) {
+            $classMapper = $c->classMapper;
+            $config = $c->config;
+            $session = $c->session;
+
+            $logger = new Logger('userActivity');
+
+            $handler = new UserActivityDatabaseHandler($classMapper, 'activity');
+
+            // Note that we get the user id from the session, not the currentUser service.
+            // This is because the currentUser service may not reflect the actual user during login/logout requests.
+            $currentUserIdKey = $config['session.keys.current_user_id'];
+            $userId = isset($session[$currentUserIdKey]) ? $session[$currentUserIdKey] : $config['reserved_user_ids.guest'];
+            $processor = new UserActivityProcessor($userId);
+
+            $logger->pushProcessor($processor);
+            $logger->pushHandler($handler);
+
+            return $logger;
+        };
+
         /*
         $container['assets'] = function ($c) {
             $config = $c->config;
