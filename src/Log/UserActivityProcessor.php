@@ -46,7 +46,7 @@ class UserActivityProcessor
         $ipaddress = $zclass->getIpAddress();
         $additionalFields = [
             //'ip_address'  => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null,
-            'ipaddress' => $ipaddress,
+            'ip_address' => $ipaddress,
             'user_id'     => $this->userId,
             'occurred_at' => $record['datetime'],
             'description' => $record['message'],

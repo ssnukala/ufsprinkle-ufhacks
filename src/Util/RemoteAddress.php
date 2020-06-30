@@ -101,6 +101,7 @@ class RemoteAddress
     {
         $ip = $this->getIpAddressFromProxy();
         if ($ip) {
+            //Debug::debug("Line 104 Returning Server headder IP  $ip");
             return $ip;
         }
 
@@ -120,20 +121,21 @@ class RemoteAddress
      */
     protected function getIpAddressFromProxy()
     {
+        /*
         if (
             !$this->useProxy
             || (isset($_SERVER['REMOTE_ADDR']) && !in_array($_SERVER['REMOTE_ADDR'], $this->trustedProxies))
         ) {
             return false;
         }
-
+        */
         $header = $this->proxyHeader;
-        Debug::debug("Line 131 Server header $header is " . $_SERVER[$header]);
+        //Debug::debug("Line 131 Server header $header is " . $_SERVER[$header]);
         if (!isset($_SERVER[$header]) || empty($_SERVER[$header])) {
             return false;
         }
 
-        Debug::debug("Line 135 Server headder " . $_SERVER[$header]);
+        //Debug::debug("Line 135 Server headder " . $_SERVER[$header]);
         // Extract IPs
         $ips = explode(',', $_SERVER[$header]);
         // trim, so we can compare against trusted proxies properly
@@ -151,8 +153,9 @@ class RemoteAddress
         // not know if it is a proxy server, or a client. As such, we treat it
         // as the originating IP.
         // @see http://en.wikipedia.org/wiki/X-Forwarded-For
-        Debug::debug("Line 153 Server headder ", $ips);
+        //Debug::debug("Line 153 Server headder ", $ips);
         $ip = array_pop($ips);
+        //Debug::debug("Line 157 Returning Server headder IP  $ip");
         return $ip;
     }
 
