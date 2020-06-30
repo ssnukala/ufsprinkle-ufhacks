@@ -6,7 +6,8 @@
  * @license   https://github.com/zendframework/zend-http/blob/master/LICENSE.md New BSD License
  */
 
-namespace Zend\Http\PhpEnvironment;
+//namespace Zend\Http\PhpEnvironment;
+namespace UserFrosting\Sprinkle\UfHacks\Util;
 
 /**
  * Functionality for determining client IP address.

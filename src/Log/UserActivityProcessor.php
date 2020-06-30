@@ -10,7 +10,8 @@
 
 namespace UserFrosting\Sprinkle\UfHacks\Log;
 
-use \Zend\Http\PhpEnvironment\RemoteAddress;
+use UserFrosting\Sprinkle\UfHacks\Util\RemoteAddress;
+//use \Zend\Http\PhpEnvironment\RemoteAddress;
 
 /**
  * Monolog processor for constructing the user activity message.
