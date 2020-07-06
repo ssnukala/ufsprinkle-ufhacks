@@ -182,67 +182,66 @@ class ServicesProvider
         };
 
         /*
-        $container['assets'] = function ($c) {
-            $config = $c->config;
-            $locator = $c->locator;
+         * Site config service (separate from Slim settings).
+         * Will attempt to automatically determine which config file(s) to use based on the value of the UF_MODE environment variable.
+         * Srinivas : Modified this to pick up a different .env file based on the subdomaion
+         * will not use this for now.
+         * @return \UserFrosting\Support\Repository\Repository
+         */
+        /*
+        $container['config'] = function ($c) {
+            // Grab any relevant dotenv variables from the .env file
+            // check if env file exists for the subdomain if so load that 
+            try {
 
-            // Load asset schema
-            if ($config['assets.use_raw']) {
-
-                // Register sprinkle assets stream, plus vendor assets in shared streams
-                $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\BROWSERIFIED_ASSET_DIR, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
-                $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
-
-                if ($config['ufhacks.assets.with_url']) {
-                    $baseUrl1 = $config['site.uri.public'];
-                } else {
-                    $baseUrl1 = '';
+                if (!isset($_SERVER['HTTP_HOST'])) {
+                    $dotenv = Dotenv::create(\UserFrosting\APP_DIR);
+                    $dotenv->load();
                 }
-                $baseUrl = $baseUrl1 . '/' . $config['assets.compiled.path'];
-                //$baseUrl = $config['site.uri.public'] . '/' . $config['assets.raw.path'];
-
-                $assets = new Assets($locator, 'assets', $baseUrl);
-
-                // Load raw asset bundles for each Sprinkle.
-
-                // Retrieve locations of raw asset bundle schemas that exist.
-                $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config['assets.raw.schema']));
-
-                // Load asset bundle schemas that exist.
-                if (array_key_exists(0, $bundleSchemas)) {
-                    $bundles = new RawAssetBundles(array_shift($bundleSchemas));
-
-                    foreach ($bundleSchemas as $bundleSchema) {
-                        $bundles->extend($bundleSchema);
-                    }
-
-                    // Add bundles to asset manager.
-                    $assets->addAssetBundles($bundles);
+                $pos = mb_strpos($_SERVER['HTTP_HOST'], '.');
+                $prefix = '';
+                if ($pos) {
+                    $prefix = strtolower(mb_substr($_SERVER['HTTP_HOST'], 0, $pos));
                 }
-            } else {
+                $file = '.env' . '.' . $prefix;
 
-                // Register compiled assets stream in public folder + alias for vendor ones + build stream for CompiledAssetBundles
-                $locator->registerStream('assets', '', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
-
-                if ($config['ufhacks.assets.with_url']) {
-                    $baseUrl1 = $config['site.uri.public'];
-                } else {
-                    $baseUrl1 = '';
+                if (!file_exists(\UserFrosting\APP_DIR . '/' . $file)) {
+                    $file = '.env';
                 }
-                $baseUrl = $baseUrl1 . '/' . $config['assets.compiled.path'];
-                $assets = new Assets($locator, 'assets', $baseUrl);
-
-                // Load compiled asset bundle.
-                $path = $locator->findResource('build://' . $config['assets.compiled.schema'], true, true);
-                $bundles = new CompiledAssetBundles($path);
-                $assets->addAssetBundles($bundles);
+                //Dotenv::load(\UserFrosting\APP_DIR, $file);
+                //Debug::debug("Line 187 the env file is $file");
+                $dotenv = Dotenv::create(\UserFrosting\APP_DIR, $file);
+                $dotenv->load();
+            } catch (InvalidPathException $e) {
+                // Skip loading the environment config file if it doesn't exist.
             }
 
-            return $assets;
+            // Get configuration mode from environment
+            $mode = getenv('UF_MODE') ?: '';
+
+            // Construct and load config repository
+            $builder = new ConfigPathBuilder($c->locator, 'config://');
+            $loader = new ArrayFileLoader($builder->buildPaths($mode));
+            $config = new Repository($loader->load());
+
+            // Construct base url from components, if not explicitly specified
+            if (!isset($config['site.uri.public'])) {
+                $uri = $c->request->getUri();
+
+                // Slim\Http\Uri likes to add trailing slashes when the path is empty, so this fixes that.
+                $config['site.uri.public'] = trim($uri->getBaseUrl(), '/');
+            }
+
+            // Hacky fix to prevent sessions from being hit too much: ignore CSRF middleware for requests for raw assets ;-)
+            // See https://github.com/laravel/framework/issues/8172#issuecomment-99112012 for more information on why it's bad to hit Laravel sessions multiple times in rapid succession.
+            $csrfBlacklist = $config['csrf.blacklist'];
+            $csrfBlacklist['^/' . $config['assets.raw.path']] = [
+                'GET',
+            ];
+
+            $config->set('csrf.blacklist', $csrfBlacklist);
+
+            return $config;
         };
         */
     }
