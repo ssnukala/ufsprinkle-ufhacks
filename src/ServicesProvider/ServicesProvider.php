@@ -14,12 +14,8 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
-use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
-use UserFrosting\Sprinkle\Core\Util\RawAssetBundles;
-use UserFrosting\Assets\AssetBundles\GulpBundleAssetsCompiledBundles as CompiledAssetBundles;
-use UserFrosting\Assets\Assets;
-use UserFrosting\Sprinkle\Core\Facades\Debug;
 use UserFrosting\Sprinkle\Account\Log\UserActivityDatabaseHandler;
+use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
 use UserFrosting\Sprinkle\UfHacks\Log\UserActivityProcessor;
 
 /**
@@ -152,7 +148,6 @@ class ServicesProvider
             return $logger;
         };
 
-
         /*
          * Logger for logging the current user's activities to the database.
          *
@@ -189,60 +184,60 @@ class ServicesProvider
          * @return \UserFrosting\Support\Repository\Repository
          */
         /*
-        $container['config'] = function ($c) {
-            // Grab any relevant dotenv variables from the .env file
-            // check if env file exists for the subdomain if so load that 
-            try {
+    $container['config'] = function ($c) {
+    // Grab any relevant dotenv variables from the .env file
+    // check if env file exists for the subdomain if so load that
+    try {
 
-                if (!isset($_SERVER['HTTP_HOST'])) {
-                    $dotenv = Dotenv::create(\UserFrosting\APP_DIR);
-                    $dotenv->load();
-                }
-                $pos = mb_strpos($_SERVER['HTTP_HOST'], '.');
-                $prefix = '';
-                if ($pos) {
-                    $prefix = strtolower(mb_substr($_SERVER['HTTP_HOST'], 0, $pos));
-                }
-                $file = '.env' . '.' . $prefix;
+    if (!isset($_SERVER['HTTP_HOST'])) {
+    $dotenv = Dotenv::create(\UserFrosting\APP_DIR);
+    $dotenv->load();
+    }
+    $pos = mb_strpos($_SERVER['HTTP_HOST'], '.');
+    $prefix = '';
+    if ($pos) {
+    $prefix = strtolower(mb_substr($_SERVER['HTTP_HOST'], 0, $pos));
+    }
+    $file = '.env' . '.' . $prefix;
 
-                if (!file_exists(\UserFrosting\APP_DIR . '/' . $file)) {
-                    $file = '.env';
-                }
-                //Dotenv::load(\UserFrosting\APP_DIR, $file);
-                //Debug::debug("Line 187 the env file is $file");
-                $dotenv = Dotenv::create(\UserFrosting\APP_DIR, $file);
-                $dotenv->load();
-            } catch (InvalidPathException $e) {
-                // Skip loading the environment config file if it doesn't exist.
-            }
+    if (!file_exists(\UserFrosting\APP_DIR . '/' . $file)) {
+    $file = '.env';
+    }
+    //Dotenv::load(\UserFrosting\APP_DIR, $file);
+    //Debug::debug("Line 187 the env file is $file");
+    $dotenv = Dotenv::create(\UserFrosting\APP_DIR, $file);
+    $dotenv->load();
+    } catch (InvalidPathException $e) {
+    // Skip loading the environment config file if it doesn't exist.
+    }
 
-            // Get configuration mode from environment
-            $mode = getenv('UF_MODE') ?: '';
+    // Get configuration mode from environment
+    $mode = env('UF_MODE') ?: '';
 
-            // Construct and load config repository
-            $builder = new ConfigPathBuilder($c->locator, 'config://');
-            $loader = new ArrayFileLoader($builder->buildPaths($mode));
-            $config = new Repository($loader->load());
+    // Construct and load config repository
+    $builder = new ConfigPathBuilder($c->locator, 'config://');
+    $loader = new ArrayFileLoader($builder->buildPaths($mode));
+    $config = new Repository($loader->load());
 
-            // Construct base url from components, if not explicitly specified
-            if (!isset($config['site.uri.public'])) {
-                $uri = $c->request->getUri();
+    // Construct base url from components, if not explicitly specified
+    if (!isset($config['site.uri.public'])) {
+    $uri = $c->request->getUri();
 
-                // Slim\Http\Uri likes to add trailing slashes when the path is empty, so this fixes that.
-                $config['site.uri.public'] = trim($uri->getBaseUrl(), '/');
-            }
+    // Slim\Http\Uri likes to add trailing slashes when the path is empty, so this fixes that.
+    $config['site.uri.public'] = trim($uri->getBaseUrl(), '/');
+    }
 
-            // Hacky fix to prevent sessions from being hit too much: ignore CSRF middleware for requests for raw assets ;-)
-            // See https://github.com/laravel/framework/issues/8172#issuecomment-99112012 for more information on why it's bad to hit Laravel sessions multiple times in rapid succession.
-            $csrfBlacklist = $config['csrf.blacklist'];
-            $csrfBlacklist['^/' . $config['assets.raw.path']] = [
-                'GET',
-            ];
+    // Hacky fix to prevent sessions from being hit too much: ignore CSRF middleware for requests for raw assets ;-)
+    // See https://github.com/laravel/framework/issues/8172#issuecomment-99112012 for more information on why it's bad to hit Laravel sessions multiple times in rapid succession.
+    $csrfBlacklist = $config['csrf.blacklist'];
+    $csrfBlacklist['^/' . $config['assets.raw.path']] = [
+    'GET',
+    ];
 
-            $config->set('csrf.blacklist', $csrfBlacklist);
+    $config->set('csrf.blacklist', $csrfBlacklist);
 
-            return $config;
-        };
-        */
+    return $config;
+    };
+     */
     }
 }
