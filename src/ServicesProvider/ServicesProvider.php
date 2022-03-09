@@ -43,9 +43,13 @@ class ServicesProvider
          */
         $container['debugLogger'] = function ($c) {
             $logger = new Logger('debug');
-            $filename = $c->config['logfiles.custom.debug'] ? $c->config['logfiles.custom.debug'] : $c->config['logfiles.default'];
-            $logFile = $c->locator->findResource('log://' . $filename, true, true);
-
+            $hostserver = env('HOST_SERVER', 'localhost');
+            if ($hostserver == 'fargate') {
+                $logFile = 'php://stdout'; // 'php://stderr'; 
+            } else {
+                $filename = $c->config['logfiles.custom.debug'] ? $c->config['logfiles.custom.debug'] : $c->config['logfiles.default'];
+                $logFile = $c->locator->findResource('log://' . $filename, true, true);
+            }
             $handler = new StreamHandler($logFile);
 
             $formatter = new MixedFormatter(null, null, true);
@@ -66,9 +70,13 @@ class ServicesProvider
         $container['errorLogger'] = function ($c) {
             $log = new Logger('errors');
 
-            $filename = $c->config['logfiles.custom.error'] ? $c->config['logfiles.custom.error'] : $c->config['logfiles.default'];
-            $logFile = $c->locator->findResource('log://' . $filename, true, true);
-
+            $hostserver = env('HOST_SERVER', 'localhost');
+            if ($hostserver == 'fargate') {
+                $logFile = 'php://stdout'; // 'php://stderr'; 
+            } else {
+                $filename = $c->config['logfiles.custom.error'] ? $c->config['logfiles.custom.error'] : $c->config['logfiles.default'];
+                $logFile = $c->locator->findResource('log://' . $filename, true, true);
+            }
             $handler = new StreamHandler($logFile, Logger::WARNING);
 
             $formatter = new LineFormatter(null, null, true);
@@ -90,9 +98,13 @@ class ServicesProvider
         $container['mailLogger'] = function ($c) {
             $log = new Logger('mail');
 
-            $filename = $c->config['logfiles.custom.mail'] ? $c->config['logfiles.custom.mail'] : $c->config['logfiles.default'];
-            $logFile = $c->locator->findResource('log://' . $filename, true, true);
-
+            $hostserver = env('HOST_SERVER', 'localhost');
+            if ($hostserver == 'fargate') {
+                $logFile = 'php://stdout'; // 'php://stderr'; 
+            } else {
+                $filename = $c->config['logfiles.custom.mail'] ? $c->config['logfiles.custom.mail'] : $c->config['logfiles.default'];
+                $logFile = $c->locator->findResource('log://' . $filename, true, true);
+            }
             $handler = new StreamHandler($logFile);
             $formatter = new LineFormatter(null, null, true);
 
@@ -112,9 +124,13 @@ class ServicesProvider
         $container['queryLogger'] = function ($c) {
             $logger = new Logger('query');
 
-            $filename = $c->config['logfiles.custom.query'] ? $c->config['logfiles.custom.query'] : $c->config['logfiles.default'];
-            $logFile = $c->locator->findResource('log://' . $filename, true, true);
-
+            $hostserver = env('HOST_SERVER', 'localhost');
+            if ($hostserver == 'fargate') {
+                $logFile = 'php://stdout'; // 'php://stderr'; 
+            } else {
+                $filename = $c->config['logfiles.custom.query'] ? $c->config['logfiles.custom.query'] : $c->config['logfiles.default'];
+                $logFile = $c->locator->findResource('log://' . $filename, true, true);
+            }
             $handler = new StreamHandler($logFile);
 
             $formatter = new MixedFormatter(null, null, true);
@@ -135,9 +151,13 @@ class ServicesProvider
         $container['authLogger'] = function ($c) {
             $logger = new Logger('auth');
 
-            $filename = $c->config['logfiles.custom.auth'] ? $c->config['logfiles.custom.auth'] : $c->config['logfiles.default'];
-            $logFile = $c->get('locator')->findResource('log://' . $filename, true, true);
-
+            $hostserver = env('HOST_SERVER', 'localhost');
+            if ($hostserver == 'fargate') {
+                $logFile = 'php://stdout'; // 'php://stderr'; 
+            } else {
+                $filename = $c->config['logfiles.custom.auth'] ? $c->config['logfiles.custom.auth'] : $c->config['logfiles.default'];
+                $logFile = $c->get('locator')->findResource('log://' . $filename, true, true);
+            }
             $handler = new StreamHandler($logFile);
 
             $formatter = new MixedFormatter(null, null, true);
