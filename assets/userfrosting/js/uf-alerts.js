@@ -34,7 +34,7 @@
  * @author Alexander Weissman <https://alexanderweissman.com>
  */
 ;
-(function ($, window, document, undefined) {
+(function($, window, document, undefined) {
     'use strict';
 
     // Define plugin name and defaults.
@@ -60,7 +60,7 @@
 
         // Detect changes to element attributes
         this.$element.attrchange({
-            callback: function (event) {
+            callback: function(event) {
                 this.element = event.target;
             }.bind(this)
         });
@@ -90,7 +90,7 @@
         /**
          * Clear all alerts from the current uf-alerts collection.
          */
-        clear: function () {
+        clear: function() {
             // See http://stackoverflow.com/a/1232046/2970321
             this.alerts.length = 0;
 
@@ -110,7 +110,7 @@
         /**
          * Fetches alerts from the alert stream
          */
-        fetch: function () {
+        fetch: function() {
             // Set a promise, so that any chained calls after fetch can wait until the messages have been retrieved
             this._newAlertsPromise = $.ajax({
                 url: this.settings.url,
@@ -127,14 +127,14 @@
         /**
          * Success callback for fetch
          */
-        _fetchSuccess: function (alerts) {
+        _fetchSuccess: function(alerts) {
             if (alerts != null) this.alerts = $.merge(this.alerts, alerts);
             this.$element.trigger('fetch.' + this._name);
         },
         /**
          * Failure callback for fetch
          */
-        _fetchFailure: function (response) {
+        _fetchFailure: function(response) {
             this.$element.trigger('error.' + this._name);
             if ((typeof site !== 'undefined') && site.debug.ajax && response.responseText) {
                 document.write(response.responseText);
@@ -148,7 +148,7 @@
         /**
          * Push a given message to the current uf-alerts collection.
          */
-        push: function (options) {
+        push: function(options) {
             this.alerts.push({
                 type: options[0],
                 message: options[1]
@@ -159,7 +159,7 @@
         /**
          * Renders the alerts.
          */
-        render: function () {
+        render: function() {
             // Wait for promise completion, only if promise is unresolved.
             if (this._newAlertsPromise.state() == 'resolved' || this._newAlertsPromise.state() == 'rejected') {
                 this._render();
@@ -172,7 +172,7 @@
         /*
          * Internal private method that physically handles rendering operation.
          */
-        _render: function () {
+        _render: function() {
             // Holds generated HTML
             var alertHtml = '';
             // Only compile alerts if there are alerts to display
@@ -238,7 +238,7 @@
             // Trigger render events
             this.$element.trigger('render.' + this._name);
             if (this.$element !== undefined && this.$element.find('button.close').length) {
-                this.$element.find('.uf-alert').fadeOut(12000, function () {
+                this.$element.find('.uf-alert').fadeOut(90000, function() {
                     if (this.$element !== undefined) {
                         //this.$element.find('.uf-alert').remove();
                         this.$element.find('button.close').click();
@@ -249,7 +249,7 @@
         /**
          * Returns true if alerts container is completely within the viewport.
          */
-        _alertsVisible: function () {
+        _alertsVisible: function() {
             var rect = this.element.getBoundingClientRect();
             return (
                 rect.top >= 0 &&
@@ -261,7 +261,7 @@
         /**
          * Completely destroy the ufAlerts plugin on the element.
          */
-        destroy: function () {
+        destroy: function() {
             // Unbind any bound events
             this.$element.off('.' + this._name);
 
@@ -273,7 +273,7 @@
     });
 
     // Handles instantiation and access to non-private methods.
-    $.fn[pluginName] = function (methodOrOptions) {
+    $.fn[pluginName] = function(methodOrOptions) {
         // Grab plugin instance
         var instance = $(this).data(pluginName);
         // If undefined or object, initalise plugin.
